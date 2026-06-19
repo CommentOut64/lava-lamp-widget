@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lava Lamp Imperative Example</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top, #274060 0%, #16213a 40%, #0b1220 100%);
+      }
+
+      [data-test-id='lava-host'] {
+        width: 260px;
+        height: 520px;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-test-id="lava-host"></div>
+    <script type="module">
+      import { mount } from '../dist/lava-lamp-widget.esm.js';
+
+      mount(document.querySelector('[data-test-id="lava-host"]'), {
+        width: 260,
+        height: 520,
+        draggable: true,
+      });
+    </script>
+  </body>
+</html>

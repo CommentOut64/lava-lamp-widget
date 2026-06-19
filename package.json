@@ -1,0 +1,18 @@
+{
+  "name": "lava-lamp-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test",
+    "verify:dist": "node scripts/verify-dist.mjs"
+  },
+  "dependencies": {
+    "twgl.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

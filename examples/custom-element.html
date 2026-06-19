@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lava Lamp Custom Element Example</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top, #274060 0%, #16213a 40%, #0b1220 100%);
+      }
+
+      lava-lamp-widget {
+        display: block;
+        width: 260px;
+        height: 520px;
+      }
+    </style>
+  </head>
+  <body>
+    <lava-lamp-widget
+      data-test-id="lava-custom"
+      width="260"
+      height="520"
+      background-color="#101820"
+    ></lava-lamp-widget>
+    <script type="module">
+      import { defineCustomElement } from '../dist/lava-lamp-widget.esm.js';
+
+      defineCustomElement();
+    </script>
+  </body>
+</html>
