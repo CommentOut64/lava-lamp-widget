@@ -26,9 +26,12 @@ test('mount returns an instance and appends a canvas to the host', () => {
       return node;
     },
     ownerDocument: {
+      getElementById() { return null; },
+      head: { appendChild() {} },
       createElement(tagName) {
         return {
           tagName,
+          appendChild(node) { return node; },
           getContext() {
             return {
               clearRect() {
@@ -68,7 +71,7 @@ test('mount returns an instance and appends a canvas to the host', () => {
 
   const instance = mount(container, {});
   assert.equal(typeof instance.mount, 'function');
-  assert.equal(appended[0].tagName, 'canvas');
+  assert.equal(appended[0].tagName, 'div');
   assert.ok(drawLog.includes('fillRect'));
 });
 

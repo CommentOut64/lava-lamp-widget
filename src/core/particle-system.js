@@ -106,10 +106,21 @@ export function stepParticles(particles, config) {
     let nextX = particle.x + nextVx * config.dt * 60;
     let nextY = particle.y + nextVy * config.dt * 60;
     
-    const minX = particle.radius;
-    const maxX = config.width - particle.radius;
     const minY = particle.radius;
     const maxY = config.height - particle.radius;
+    
+    // Trapezoid bounds calculation based on clip-path
+    // Top-section is clipped from 20% to 0% on the left, 80% to 100% on the right.
+    // Glass starts at 15% down the top-section and ends at 100%.
+    // ratio goes from 0.15 (top of glass) to 1.0 (bottom of glass).
+    const ratio = 0.85 * (nextY / config.height) + 0.15;
+    // At ratio 1.0 (bottom), inset is 0. At ratio 0.0 (top of cap), inset is 0.2.
+    const insetPercentage = 0.2 * (1 - ratio);
+    const leftEdge = config.width * insetPercentage;
+    const rightEdge = config.width * (1 - insetPercentage);
+    
+    const minX = leftEdge + particle.radius;
+    const maxX = rightEdge - particle.radius;
     
     let resolvedVx = nextVx;
     let resolvedVy = nextVy;

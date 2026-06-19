@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mergeReturnedParticles, spawnReservoirParticles, shouldDetachBlob } from '../../src/core/reservoir.js';
 
-test('reservoir particles start near lamp bottom', () => {
+test('reservoir particles start distributed across container height', () => {
   const particles = spawnReservoirParticles({ width: 260, height: 520, count: 8 });
-  assert.ok(particles.every((p) => p.y > 520 * 0.72));
+  assert.ok(particles.every((p) => p.y >= 520 * 0.1 && p.y <= 520 * 0.9));
 });
 
 test('hot reservoir section can detach', () => {

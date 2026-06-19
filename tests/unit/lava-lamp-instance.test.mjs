@@ -56,12 +56,15 @@ function createContainer(log) {
     setPointerCapture() {},
     releasePointerCapture() {},
     ownerDocument: {
+      getElementById() { return null; },
+      head: { appendChild(node) { log.push(['head.appendChild', node.tagName]); } },
       createElement(tagName) {
         return {
           tagName,
           style: {},
           width: 0,
           height: 0,
+          appendChild(node) { return node; },
           getContext() {
             return createFakeContext(log);
           },

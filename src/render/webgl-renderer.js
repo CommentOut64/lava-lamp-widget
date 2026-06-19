@@ -68,12 +68,17 @@ export class WebGLRenderer {
       const p = particles[i];
       // x is depth in shader. We can add a slight pseudo-3D depth variation
       uParticles[i * 4 + 0] = (i % 3 - 1) * 0.2;
-      // y is vertical. Map [height, 0] to [-2.0, 2.0]
-      uParticles[i * 4 + 1] = (1.0 - p.y / height) * 4.0 - 2.0;
-      // z is horizontal. Map [0, width] to [-1.25, 1.25] assuming 260x520 aspect
-      uParticles[i * 4 + 2] = (p.x / width) * 2.5 - 1.25;
-      // w is radius. Scale appropriately
-      uParticles[i * 4 + 3] = (p.radius / width) * 2.5;
+      // The camera looks from x=-6 towards origin. Intersection with x=0 plane is at distance 6.
+      // uv.y maps to [-0.5, 0.5], so world y at x=0 maps to [-3.0, 3.0].
+      uParticles[i * 4 + 1] = (1.0 - p.y / height) * 6.0 - 3.0;
+      
+      // uv.x maps to [-0.5*aspect, 0.5*aspect], so world z at x=0 maps to [-3.0*aspect, 3.0*aspect].
+      const aspect = width / height;
+      const zRange = 6.0 * aspect;
+      uParticles[i * 4 + 2] = (p.x / width) * zRange - (zRange / 2.0);
+      
+      // Scale radius proportionally
+      uParticles[i * 4 + 3] = (p.radius / width) * zRange;
     }
 
     try {
