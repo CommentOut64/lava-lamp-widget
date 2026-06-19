@@ -58,27 +58,20 @@ export class WebGLRenderer {
 
     const bgColor = hexToRgbRatio(theme.liquid[0] || '#101820');
     const lavaRaw = hexToRgbRatio(theme.wax[0] || '#ff7a18');
-    const lavaColor = [lavaRaw[0] * 2.0, lavaRaw[1] * 1.5, lavaRaw[2] - 0.2];
+    const lavaColor = [lavaRaw[0], lavaRaw[1], lavaRaw[2]];
 
     const MAX_PARTICLES = 72;
     const count = Math.min(particles.length, MAX_PARTICLES);
-    const uParticles = new Float32Array(MAX_PARTICLES * 4);
+    const particlesData = new Float32Array(MAX_PARTICLES * 4);
 
     for (let i = 0; i < count; i++) {
       const p = particles[i];
-      // x is depth in shader. We can add a slight pseudo-3D depth variation
-      uParticles[i * 4 + 0] = (i % 3 - 1) * 0.2;
-      // The camera looks from x=-6 towards origin. Intersection with x=0 plane is at distance 6.
-      // uv.y maps to [-0.5, 0.5], so world y at x=0 maps to [-3.0, 3.0].
-      uParticles[i * 4 + 1] = (1.0 - p.y / height) * 6.0 - 3.0;
-      
-      // uv.x maps to [-0.5*aspect, 0.5*aspect], so world z at x=0 maps to [-3.0*aspect, 3.0*aspect].
-      const aspect = width / height;
-      const zRange = 6.0 * aspect;
-      uParticles[i * 4 + 2] = (p.x / width) * zRange - (zRange / 2.0);
-      
-      // Scale radius proportionally
-      uParticles[i * 4 + 3] = (p.radius / width) * zRange;
+      // Pass actual pixel coordinates. Flip Y since gl_FragCoord is Y-up.
+      particlesData[i * 4 + 0] = p.x;
+      particlesData[i * 4 + 1] = height - p.y;
+      // Pass visual radius (scaled up to ensure massive overlapping for Gaussian field)
+      particlesData[i * 4 + 2] = p.radius * 1.6;
+      particlesData[i * 4 + 3] = 0.0;
     }
 
     try {
@@ -89,7 +82,7 @@ export class WebGLRenderer {
         backgroundColor: bgColor,
         lavaColor: lavaColor,
         uParticleCount: count,
-        uParticles: uParticles,
+        uParticles: particlesData,
       });
       TWGL.drawBufferInfo(this.gl, this.bufferInfo);
     } catch (error) {

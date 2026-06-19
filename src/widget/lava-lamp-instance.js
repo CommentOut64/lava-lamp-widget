@@ -89,7 +89,7 @@ export class LavaLampInstance {
       this.particles = spawnReservoirParticles({
         width: this.options.width,
         height: this.glassHeight,
-        count: 40,
+        count: 30,
       });
     }
 
@@ -141,9 +141,9 @@ export class LavaLampInstance {
       time: this.time,
       width: this.options.width,
       height: this.glassHeight,
-      gravity: this.options.physics?.gravity || 0.015,
-      buoyancy: this.options.physics?.buoyancy || 0.05,
-      viscosity: this.options.physics?.viscosity || 0.5,
+      gravity: this.options.physics?.gravity || 0.005,
+      buoyancy: this.options.physics?.buoyancy || 0.015,
+      viscosity: this.options.physics?.viscosity || 0.8,
       wallBounce: this.options.physics?.wallBounce || 0.15,
       heat: this.options.heat || 0.85,
       inertialImpulse: impulse,
