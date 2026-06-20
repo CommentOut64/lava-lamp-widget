@@ -12,6 +12,47 @@
         place-items: center;
         background:
           radial-gradient(circle at top, #274060 0%, #16213a 40%, #0b1220 100%);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: white;
+      }
+
+      .layout-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 120px;
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 40px;
+      }
+
+      .intro-text {
+        max-width: 450px;
+      }
+
+      .intro-text h1 {
+        font-size: 3rem;
+        margin-bottom: 30px;
+        background: linear-gradient(90deg, #ff7a18, #f4a261);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .intro-text p {
+        font-size: 1.25rem;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 16px;
+        position: relative;
+        padding-left: 28px;
+      }
+
+      .intro-text p::before {
+        content: '✨';
+        position: absolute;
+        left: 0;
+        top: 2px;
+        font-size: 1.1rem;
       }
 
       lava-lamp-widget {
@@ -24,12 +65,20 @@
     </style>
   </head>
   <body>
-    <lava-lamp-widget
-      data-test-id="lava-custom"
-      width="160"
-      height="520"
-      background-color="#101820"
-    ></lava-lamp-widget>
+    <div class="layout-container">
+      <div class="intro-text">
+        <h1>Lava Lamp Widget</h1>
+        <p>一个基于 WebGL 和流体物理引擎的高性能熔岩灯组件</p>
+        <p>高度可定制（大小、颜色、粒子状态）</p>
+        <p>框架无关，可直接嵌入网页</p>
+      </div>
+      <lava-lamp-widget
+        data-test-id="lava-custom"
+        width="160"
+        height="520"
+        background-color="#101820"
+      ></lava-lamp-widget>
+    </div>
     <script src="../dist/lava-lamp-widget.js"></script>
     <script>
       LavaLampWidget.defineCustomElement();

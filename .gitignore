@@ -1,9 +1,6 @@
 # Dependency directories
 node_modules/
 
-# Build outputs
-dist/
-
 # OS metadata
 .DS_Store
 Thumbs.db
