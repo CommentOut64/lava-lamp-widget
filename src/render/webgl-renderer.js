@@ -26,7 +26,8 @@ export class WebGLRenderer {
   constructor(canvas) {
     this.canvas = canvas;
     const contextAttributes = {
-      alpha: false,
+      alpha: true,
+      premultipliedAlpha: false,
       antialias: false,
       depth: false,
       stencil: false,
@@ -69,12 +70,15 @@ export class WebGLRenderer {
       // Pass actual pixel coordinates. Flip Y since gl_FragCoord is Y-up.
       particlesData[i * 4 + 0] = p.x;
       particlesData[i * 4 + 1] = height - p.y;
-      // Pass visual radius (scaled up to ensure massive overlapping for Gaussian field)
-      particlesData[i * 4 + 2] = p.radius * 1.6;
+      // Pass visual radius. Balanced multiplier 1.45: smoother than 1.3, snaps better than 1.6
+      particlesData[i * 4 + 2] = p.radius * 1.45;
       particlesData[i * 4 + 3] = 0.0;
     }
 
     try {
+      // Clear the canvas to fully transparent so CSS backgrounds show through
+      this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
       TWGL.setUniforms(this.programInfo, {
         uTime: time * 1e-3,
         uResolution: [width, height],

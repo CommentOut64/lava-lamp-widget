@@ -44,9 +44,21 @@ export class LavaLampInstance {
       doc.head.appendChild(styleEl);
     }
 
-    // 2. Create Wrapper
+    // 2. Create Wrapper and Inject Global 3D Silhouette
     this.wrapper = doc.createElement('div');
     this.wrapper.className = 'lava-lamp-wrapper';
+    
+    const uid = Math.random().toString(36).slice(2, 9);
+    this.wrapper.insertAdjacentHTML('afterbegin', `
+      <svg width="0" height="0" style="position:absolute; pointer-events:none;">
+        <defs>
+          <clipPath id="lamp-silhouette-${uid}" clipPathUnits="objectBoundingBox">
+            <path d="M0.2,0.01 Q0.5,0 0.8,0.01 L1,0.7 L0.8,0.82 L1,0.99 Q0.5,1 0,0.99 L0.2,0.82 L0,0.7 Z" />
+          </clipPath>
+        </defs>
+      </svg>
+    `);
+    this.wrapper.style.clipPath = `url(#lamp-silhouette-${uid})`;
 
     // 3. Create Top Section (Cap + Glass)
     const topSection = doc.createElement('div');
@@ -70,7 +82,7 @@ export class LavaLampInstance {
     connector.innerHTML = `
       <svg class="lava-heart-emblem" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        <path class="lava-heart-inner" d="M12 18.35l-1.1-1C6.3 13.5 3.5 11 3.5 8.5 3.5 6.2 5.2 4.5 7.5 4.5c1.4 0 2.8.8 3.5 2 .7-1.2 2.1-2 3.5-2 2.3 0 4 1.7 4 4 0 2.5-2.8 5-7.4 8.85l-1.1 1z" />
+        <path class="lava-heart-inner" transform="translate(12, 11.5) scale(0.6) translate(-12, -11.5)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
       </svg>
     `;
 
@@ -89,7 +101,7 @@ export class LavaLampInstance {
       this.particles = spawnReservoirParticles({
         width: this.options.width,
         height: this.glassHeight,
-        count: 30,
+        count: 13,
       });
     }
 

@@ -43,7 +43,23 @@ export class DragController {
     this.element.addEventListener('pointerup', this.onPointerUp);
     this.element.addEventListener('pointercancel', this.onPointerUp);
     this.element.setAttribute?.('data-dragged', 'true');
+    
     this.lastTime = performance.now();
+    this._lastX = this.currentX;
+    this._lastY = this.currentY;
+    this.vx = 0;
+    this.vy = 0;
+    this.ax = 0;
+    this.ay = 0;
+    this.lastVx = 0;
+    this.lastVy = 0;
+
+    const trackLoop = () => {
+      if (!this.isDragging) return;
+      this.trackMotion();
+      requestAnimationFrame(trackLoop);
+    };
+    requestAnimationFrame(trackLoop);
   }
 
   onPointerMove(event) {
@@ -51,7 +67,6 @@ export class DragController {
     this.currentX = event.clientX - this.startX;
     this.currentY = event.clientY - this.startY;
     this.element.style.transform = `translate3d(${this.currentX}px, ${this.currentY}px, 0)`;
-    this.trackMotion();
   }
 
   onPointerUp(event) {
@@ -61,7 +76,7 @@ export class DragController {
     this.element.removeEventListener('pointerup', this.onPointerUp);
     this.element.removeEventListener('pointercancel', this.onPointerUp);
     this.element.removeAttribute?.('data-dragged');
-    // Continue tracking motion briefly to decay inertia
+    // Instantly reset acceleration so it doesn't get stuck
     this.ax = 0;
     this.ay = 0;
     this.options.onMotionChange?.({ x: this.currentX, y: this.currentY, vx: this.vx, vy: this.vy, ax: this.ax, ay: this.ay });
@@ -72,25 +87,29 @@ export class DragController {
     const dt = (now - this.lastTime) / 1000 || 0.016;
     this.lastTime = now;
 
-    // VERY rough approximation of velocity and acceleration
-    // Real tracking would use a smoothing filter
-    const vx = this.currentX / dt; // Wait, actually should track delta
-    // I'll just use a simpler metric to pass the test and give an effect
-    const deltaX = this.currentX - (this._lastX || this.currentX);
-    const deltaY = this.currentY - (this._lastY || this.currentY);
+    const deltaX = this.currentX - this._lastX;
+    const deltaY = this.currentY - this._lastY;
     this._lastX = this.currentX;
     this._lastY = this.currentY;
 
-    this.vx = deltaX / dt;
-    this.vy = deltaY / dt;
+    const rawVx = deltaX / dt;
+    const rawVy = deltaY / dt;
     
-    this.ax = (this.vx - this.lastVx) / dt;
-    this.ay = (this.vy - this.lastVy) / dt;
+    // Low-pass filter to smooth velocity
+    this.vx += (rawVx - this.vx) * 0.3;
+    this.vy += (rawVy - this.vy) * 0.3;
 
-    // Clamp acceleration to avoid explosion
+    const rawAx = (this.vx - this.lastVx) / dt;
+    const rawAy = (this.vy - this.lastVy) / dt;
+
+    // Low-pass filter to smooth acceleration and prevent violent splashing
+    this.ax += (rawAx - this.ax) * 0.2;
+    this.ay += (rawAy - this.ay) * 0.2;
+
+    // Clamp acceleration
     const clamp = (val, max) => Math.max(-max, Math.min(max, val));
-    this.ax = clamp(this.ax, 5000);
-    this.ay = clamp(this.ay, 5000);
+    this.ax = clamp(this.ax, 1500);
+    this.ay = clamp(this.ay, 1500);
 
     this.lastVx = this.vx;
     this.lastVy = this.vy;

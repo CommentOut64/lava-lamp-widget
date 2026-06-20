@@ -10,7 +10,7 @@ precision highp float;
 
 uniform float uTime;
 uniform vec2 uResolution;
-uniform vec3 backgroundColor;
+// backgroundColor is no longer needed in shader since we output transparent alpha
 uniform vec3 lavaColor;
 
 #define MAX_PARTICLES 72
@@ -42,12 +42,8 @@ void main() {
     float d = getDensity(uv);
     float threshold = 0.5; // Gaussian isosurface threshold
     
-    if (d > threshold) {
-        // Render a perfectly flat, uniform 2D solid color without any 3D shading or highlights.
-        // This ensures the edge color is 100% identical to the interior color.
-        gl_FragColor = vec4(lavaColor, 1.0);
-    } else {
-        gl_FragColor = vec4(backgroundColor, 1.0);
-    }
+    // Output lava color with smooth alpha
+    float alpha = smoothstep(threshold - 0.02, threshold + 0.02, d);
+    gl_FragColor = vec4(lavaColor, alpha);
 }
 `;
