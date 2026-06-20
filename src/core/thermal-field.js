@@ -17,5 +17,6 @@ export function sampleTemperature(point, config) {
     temp -= topIntensity * 0.3;
   }
 
-  return Math.max(0, temp);
+  const heatMultiplier = config.heat !== undefined ? config.heat : 0.85;
+  return Math.max(0, temp) * (heatMultiplier / 0.85);
 }

@@ -15,9 +15,11 @@
       }
 
       lava-lamp-widget {
+        transform: scale(1.2); /* 放大 */
         display: block;
         width: 160px;
         height: 520px;
+        z-index: 9999;
       }
     </style>
   </head>
@@ -28,10 +30,40 @@
       height="520"
       background-color="#101820"
     ></lava-lamp-widget>
-    <script type="module">
-      import { defineCustomElement } from '../dist/lava-lamp-widget.esm.js';
+    <script src="../dist/lava-lamp-widget.js"></script>
+    <script>
+      LavaLampWidget.defineCustomElement();
 
-      defineCustomElement();
+      // 获取 Web Component 以及它内部挂载的实例
+      const widget = document.querySelector('lava-lamp-widget');
+      const instance = widget.instance;
+
+      // 开启自定义调色板模式
+      instance.setOptions({ backgroundMode: 'custom' });
+
+      let time = 0;
+      function cycleColors() {
+        time += 0.002; // 大幅调低变色速度，让过渡变得非常缓慢柔和
+        
+        // 利用正弦波相位差，让红绿蓝在 0~255 之间平滑交替过渡
+        const r = Math.floor((Math.sin(time) * 0.5 + 0.5) * 255);
+        const g = Math.floor((Math.sin(time + (2 * Math.PI / 3)) * 0.5 + 0.5) * 255);
+        const b = Math.floor((Math.sin(time + (4 * Math.PI / 3)) * 0.5 + 0.5) * 255);
+        
+        // 转换为两位的 16 进制字符串，并确保拼接成 '#RRGGBB' 格式
+        const toHex = (c) => c.toString(16).padStart(2, '0');
+        const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        
+        // 注意：底层的渲染器（WebGL）和调色板系统要求颜色格式为 Hex 并且是数组
+        instance.setPalette({
+          wax: [hexColor],
+          liquid: [hexColor] 
+        });
+        
+        requestAnimationFrame(cycleColors);
+      }
+      
+      cycleColors();
     </script>
   </body>
 </html>

@@ -88,7 +88,9 @@ export function stepParticles(particles, config) {
           forceY += ny * overlap * 0.05;
         } else {
           // 处于最佳接触距离内：产生表面张力（互相吸引），把它们拉在一起
-          const pull = Math.sin(((dist - restingDist) / (influenceDist - restingDist)) * Math.PI) * 0.005;
+          // 如果粒子状态不同（例如一个正在上升，一个死守底部），我们需要大幅削弱表面张力，防止它们互相死锁卡成一坨
+          const pullStrength = (particle.state !== n.state) ? 0.0005 : 0.005;
+          const pull = Math.sin(((dist - restingDist) / (influenceDist - restingDist)) * Math.PI) * pullStrength;
           forceX -= nx * pull;
           forceY -= ny * pull;
         }
@@ -208,10 +210,14 @@ export function stepParticles(particles, config) {
     const impulseX = config.inertialImpulse?.x ?? 0;
     const impulseY = config.inertialImpulse?.y ?? 0;
     
+    // 施加微小的布朗运动扰动，打破可能存在的绝对受力平衡死锁
+    const noiseX = (Math.random() - 0.5) * 0.005;
+    const noiseY = (Math.random() - 0.5) * 0.005;
+
     // 在 POOL 状态下增加阻力，防止它们来回滑动
     const dragBase = (state === STATE_POOL_BOTTOM || state === STATE_POOL_TOP) ? 0.85 : (1.0 - config.viscosity * 0.04);
-    const nextVx = (particle.vx + forceX + impulseX) * dragBase;
-    const nextVy = (particle.vy + gravityForce + heatLift + forceY + impulseY) * dragBase;
+    const nextVx = (particle.vx + forceX + impulseX + noiseX) * dragBase;
+    const nextVy = (particle.vy + gravityForce + heatLift + forceY + impulseY + noiseY) * dragBase;
     
     let nextX = particle.x + nextVx * config.dt * 60;
     let nextY = particle.y + nextVy * config.dt * 60;
